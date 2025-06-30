@@ -7,7 +7,7 @@ const app = express();
 //googlesheet function
 async function appendToGoogleSheet(record) {
   const client = await auth.getClient();
-  const spreadsheetId = process.env.SPREADSHEET_ID;
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
   const range = '簽收紀錄';  // 請對應你試算表的工作表名稱
 
   // 格式依照你前端傳來的結構調整
