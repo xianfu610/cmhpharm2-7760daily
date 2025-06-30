@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>麻醉科1-4級管制藥品領用記錄報表</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 簽收人資料頁面 -->
+        <div id="signer-info-page">
+            <h2>麻醉科1-4級管制藥品領用簽收</h2>
+            <form id="signer-form">
+                <label for="personnel-number">人事號:</label>
+                <input type="text" id="personnel-number" class="input-field" required>
+
+                <label for="date">日期:</label>
+                <input type="date" id="date" class="input-field" required>
+
+                <button type="submit" class="button">下一步</button>
+            </form>
+            <button class="button" id="download-button">下載簽收紀錄</button>
+            <button class="button" id="view-records-button">查詢紀錄</button> 
+        </div>
+        <!-- 簽收資料頁面 -->
+        <div id="drug-data-page" class="hidden">
+            <h2>簽收資料</h2>
+            <form id="drug-form">
+                <label for="signing-date">簽收日期:</label>
+                <input type="date" id="signing-date" class="input-field" required>
+                <label id="pharmacist-label">發藥藥師：尚未載入</label>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>藥品</th>
+                            <th>發藥數量</th>
+                            <th>確認</th>
+                        </tr>
+                    </thead>
+                    <tbody id="drug-list"></tbody>
+                </table>
+
+                <button type="submit" class="button">完成簽收</button>
+            </form>
+        </div>
+        <!-- 下載頁面 -->
+        <div id="download-page" class="hidden">
+            <h2>下載簽收紀錄</h2>
+            <form id="download-form">
+                <label for="start-date">開始日期:</label>
+                <input type="date" id="start-date" class="input-field" required>
+
+                <label for="end-date">結束日期:</label>
+                <input type="date" id="end-date" class="input-field" required>
+
+                <button type="submit" class="button">下載</button>
+            </form>
+            <button class="button" id="back-button">返回</button>
+        </div>
+ <!-- 查詢紀錄頁面 -->
+        <div id="view-records-page" class="hidden">
+            <h2>查詢紀錄</h2>
+            <form id="view-records-form">
+                <label for="query-start-date">開始日期:</label>
+                <input type="date" id="query-start-date" class="input-field" required>
+
+                <label for="query-end-date">結束日期:</label>
+                <input type="date" id="query-end-date" class="input-field" required>
+
+                <button type="submit" class="button">查詢</button>
+            </form>
+            <div id="records-result" class="hidden">
+                <h3>查詢結果</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>人事號</th>
+                            <th>藥品</th>
+                            <th>數量</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-list"></tbody>
+                </table>
+            </div>
+            <button class="button" id="back-to-main-button">返回</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
