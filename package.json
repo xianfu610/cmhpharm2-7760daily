@@ -1,0 +1,13 @@
+{
+  "name": "prism-cooperative-melon",
+  "version": "1.0.0",
+  "description": "Your project description",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "googleapis": "^92.0.0"
+  }
+}
