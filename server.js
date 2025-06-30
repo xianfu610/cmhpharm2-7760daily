@@ -4,6 +4,29 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
+//googlesheet function
+async function appendToGoogleSheet(record) {
+  const client = await auth.getClient();
+  const spreadsheetId = process.env.SPREADSHEET_ID;
+  const range = '簽收紀錄';  // 請對應你試算表的工作表名稱
+
+  // 格式依照你前端傳來的結構調整
+  const values = record.drugs.map(drug => [
+    record.date,
+    record.personnelNumber,
+    drug.name,
+    drug.quantity,
+    drug.confirmed
+  ]);
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range,
+    valueInputOption: 'USER_ENTERED',
+    resource: { values },
+  });
+}
+
 const port = process.env.PORT || 3000;
 
 // 中間件
@@ -15,7 +38,18 @@ const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
 const sheetId = process.env.GOOGLE_SHEET_ID;
 
 // Google Sheets API 設置
-const sheets = google.sheets({ version: 'v4', auth: apiKey });
+// 替代原本的 auth，改用 service account
+const keyFilePath = '/tmp/service-account.json';
+if (!fs.existsSync(keyFilePath)) {
+  fs.writeFileSync(keyFilePath, Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT, 'base64'));
+}
+
+const auth = new google.auth.GoogleAuth({
+  keyFile: keyFilePath,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+});
+
+const sheets = google.sheets({ version: 'v4', auth });
 
 // 本地記錄文件路徑
 const RECORDS_FILE = path.join(__dirname, 'records.json');
@@ -62,34 +96,21 @@ app.get('/api/drug-data', async (req, res) => {
 });
 
 // 保存簽收記錄到本地
-app.post('/api/record', (req, res) => {
+app.post('/api/record', async (req, res) => {
   try {
     const newRecord = req.body;
-    let records = [];
-    
-    // 檢查文件是否存在且不為空
-    if (fs.existsSync(RECORDS_FILE) && fs.statSync(RECORDS_FILE).size > 0) {
-      const fileContent = fs.readFileSync(RECORDS_FILE, 'utf8');
-      try {
-        records = JSON.parse(fileContent);
-      } catch (parseError) {
-        console.error('Error parsing existing records:', parseError);
-        // 如果解析失敗，我們將使用空數組
-      }
-    }
 
-    // 確保 records 是一個數組
-    if (!Array.isArray(records)) {
-      records = [];
-    }
+    await appendToGoogleSheet(newRecord);  // ← 寫入 Google Sheets
 
-    records.push(newRecord);
-    fs.writeFileSync(RECORDS_FILE, JSON.stringify(records, null, 2));
-    console.log('Record saved successfully');
-    res.status(200).json({ message: '記錄已保存到本地文件' });
+    console.log('Record saved to Google Sheets');
+    res.status(200).json({ message: '記錄已儲存至 Google Sheets' });
+
   } catch (error) {
-    console.error('Error saving record:', error);
-    res.status(500).json({ message: '保存記錄時出現錯誤', error: error.message });
+    console.error('Error saving record to Google Sheets:', error);
+    res.status(500).json({
+      message: '儲存記錄時發生錯誤',
+      error: error.message
+    });
   }
 });
 
